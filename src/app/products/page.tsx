@@ -10,13 +10,18 @@ export default async function ProductsPage() {
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, title, price, status, created_at, image_path")
+    .select(
+      "id, title, price, status, created_at, image_path, product_likes(count), product_comments(count)"
+    )
     .order("created_at", { ascending: false });
 
   const imageUrlOf = (path: string | null) =>
     path
       ? supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl
       : null;
+
+  // 임베드된 개수는 [{ count: n }] 형태로 들어옴
+  const countOf = (rows?: { count: number }[]) => rows?.[0]?.count ?? 0;
 
   return (
     <div className="mx-auto w-full max-w-4xl flex-1 px-5 py-8">
@@ -63,6 +68,10 @@ export default async function ProductsPage() {
                   </span>
                   <span className="text-sm text-foreground/50">
                     {new Date(product.created_at).toLocaleDateString("ko-KR")}
+                  </span>
+                  <span className="flex items-center gap-3 text-xs text-foreground/50">
+                    <span>❤️ {countOf(product.product_likes)}</span>
+                    <span>💬 {countOf(product.product_comments)}</span>
                   </span>
                 </div>
                 <div className="flex flex-col items-end gap-1">
