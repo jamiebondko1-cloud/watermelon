@@ -25,7 +25,7 @@ export default async function EditProductPage({
 
   const { data: product } = await supabase
     .from("products")
-    .select("id, seller_id, title, description, price, status")
+    .select("id, seller_id, title, description, price, status, image_path")
     .eq("id", id)
     .single();
 
@@ -37,6 +37,11 @@ export default async function EditProductPage({
   if (product.seller_id !== user.id) {
     redirect(`/products/${id}`);
   }
+
+  const imageUrl = product.image_path
+    ? supabase.storage.from("product-images").getPublicUrl(product.image_path)
+        .data.publicUrl
+    : null;
 
   return (
     <div className="mx-auto w-full max-w-lg flex-1 px-5 py-8">
@@ -74,6 +79,33 @@ export default async function EditProductPage({
             className="rounded-lg border border-rind/30 px-3 py-2 text-foreground outline-none focus:border-rind"
           />
         </label>
+
+        <div className="flex flex-col gap-2 text-sm font-medium text-rind-dark">
+          사진
+          {imageUrl && (
+            <div className="flex flex-col gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt={product.title}
+                className="max-h-48 w-full rounded-lg border border-rind/20 object-contain"
+              />
+              <label className="flex items-center gap-2 font-normal text-foreground/70">
+                <input type="checkbox" name="remove_image" />
+                현재 사진 삭제
+              </label>
+            </div>
+          )}
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            className="rounded-lg border border-rind/30 px-3 py-2 text-sm font-normal text-foreground file:mr-3 file:rounded-full file:border-0 file:bg-flesh/10 file:px-3 file:py-1 file:text-flesh-dark outline-none focus:border-rind"
+          />
+          <span className="font-normal text-xs text-foreground/50">
+            새 사진을 선택하면 기존 사진이 교체돼요.
+          </span>
+        </div>
 
         <label className="flex flex-col gap-1 text-sm font-medium text-rind-dark">
           설명

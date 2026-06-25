@@ -55,6 +55,16 @@ export default async function NewProductPage({
         </label>
 
         <label className="flex flex-col gap-1 text-sm font-medium text-rind-dark">
+          사진 (선택)
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            className="rounded-lg border border-rind/30 px-3 py-2 text-sm text-foreground file:mr-3 file:rounded-full file:border-0 file:bg-flesh/10 file:px-3 file:py-1 file:text-flesh-dark outline-none focus:border-rind"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm font-medium text-rind-dark">
           설명
           <textarea
             name="description"

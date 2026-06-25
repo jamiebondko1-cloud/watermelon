@@ -10,8 +10,13 @@ export default async function ProductsPage() {
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, title, price, status, created_at")
+    .select("id, title, price, status, created_at, image_path")
     .order("created_at", { ascending: false });
+
+  const imageUrlOf = (path: string | null) =>
+    path
+      ? supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl
+      : null;
 
   return (
     <div className="mx-auto w-full max-w-4xl flex-1 px-5 py-8">
@@ -38,9 +43,21 @@ export default async function ProductsPage() {
             <li key={product.id}>
               <Link
                 href={`/products/${product.id}`}
-                className="flex items-center justify-between rounded-2xl border border-rind/20 bg-white px-5 py-4 shadow-sm transition hover:border-rind/50"
+                className="flex items-center gap-4 rounded-2xl border border-rind/20 bg-white px-5 py-4 shadow-sm transition hover:border-rind/50"
               >
-                <div className="flex flex-col gap-1">
+                {imageUrlOf(product.image_path) ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={imageUrlOf(product.image_path)!}
+                    alt={product.title}
+                    className="h-16 w-16 shrink-0 rounded-lg border border-rind/15 object-cover"
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-rind/10 text-2xl">
+                    🍉
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col gap-1">
                   <span className="font-semibold text-rind-dark">
                     {product.title}
                   </span>

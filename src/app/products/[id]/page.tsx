@@ -21,7 +21,7 @@ export default async function ProductDetailPage({
 
   const { data: product } = await supabase
     .from("products")
-    .select("id, seller_id, title, description, price, status, created_at")
+    .select("id, seller_id, title, description, price, status, created_at, image_path")
     .eq("id", id)
     .single();
 
@@ -30,6 +30,11 @@ export default async function ProductDetailPage({
   }
 
   const isOwner = user?.id === product.seller_id;
+
+  const imageUrl = product.image_path
+    ? supabase.storage.from("product-images").getPublicUrl(product.image_path)
+        .data.publicUrl
+    : null;
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-5 py-8">
@@ -55,6 +60,17 @@ export default async function ProductDetailPage({
             </span>
           )}
         </div>
+
+        {imageUrl && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageUrl}
+              alt={product.title}
+              className="mt-4 max-h-96 w-full rounded-xl border border-rind/15 object-contain"
+            />
+          </>
+        )}
 
         <p className="mt-2 text-2xl font-extrabold text-flesh-dark">
           {product.price.toLocaleString("ko-KR")}원
